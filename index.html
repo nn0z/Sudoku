@@ -537,6 +537,19 @@
   }
   .image-box .category-badge { background: linear-gradient(135deg, var(--primary), var(--success)); color: white; padding: 5px 14px; border-radius: 15px; font-size: 0.8rem; margin-top: 10px; font-weight: 700; }
   .image-box .hint-text { color: var(--text-muted); font-size: 0.85rem; margin-top: 10px; font-style: italic; }
+  .image-box .image-name-en {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+  }
+  .image-box .image-name-ar {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
 
   .player-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
   .answer-area { display: none; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
@@ -882,6 +895,31 @@
     box-shadow: 0 0 20px var(--shadow);
   }
 
+  .hearts-options {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .heart-option {
+    padding: 12px 6px;
+    background: rgba(255,71,87,0.1);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text);
+    transition: 0.2s;
+  }
+  .heart-option:hover { background: rgba(255,71,87,0.25); transform: scale(1.05); }
+  .heart-option.selected {
+    background: linear-gradient(135deg, var(--danger), #ff6b7a);
+    color: white;
+    border-color: var(--danger);
+    box-shadow: 0 0 20px rgba(255,71,87,0.4);
+  }
+
   .timer-toggle-row {
     display: flex;
     align-items: center;
@@ -1114,6 +1152,91 @@
     font-size: 1.15rem;
   }
 
+  .sudoku-race-panel {
+    max-width: 480px;
+    width: min(90vw, 480px);
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .race-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .race-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .race-row-header .name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .race-row-header .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(108,92,231,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+  .race-row-header .percent {
+    font-family: 'Courier New', monospace;
+    font-weight: 900;
+    font-size: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--success));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .race-row.me .percent {
+    background: linear-gradient(135deg, var(--success), #00e6b0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .race-bar {
+    height: 14px;
+    background: rgba(108,92,231,0.12);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .race-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), #8b7cf0);
+    border-radius: 10px;
+    transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    box-shadow: 0 0 15px rgba(108,92,231,0.6);
+  }
+  .race-bar-fill.me {
+    background: linear-gradient(90deg, var(--success), #00e6b0);
+    box-shadow: 0 0 15px rgba(0,217,163,0.6);
+  }
+  .race-bar-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shine 2s infinite;
+  }
+  @keyframes shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
   .sudoku-points-bar {
     background: linear-gradient(135deg, rgba(108,92,231,0.2), rgba(0,217,163,0.15));
     border: 2px solid var(--primary);
@@ -1175,6 +1298,12 @@
     cursor: default;
     font-weight: 900;
   }
+  .sudoku-cell.user-locked {
+    background: linear-gradient(135deg, rgba(0,217,163,0.15), rgba(0,217,163,0.08));
+    color: var(--success);
+    cursor: default;
+    font-weight: 900;
+  }
   .sudoku-cell.selected {
     background: linear-gradient(135deg, var(--primary), var(--success));
     color: white;
@@ -1204,24 +1333,6 @@
     60% { transform: translateX(-3px) scale(1.1); }
     80% { transform: translateX(3px) scale(1.05); }
     100% { background: rgba(255,71,87,0.85); color: white; transform: scale(1); }
-  }
-  .sudoku-cell.remote-correct {
-    animation: remoteCorrect 0.9s ease;
-  }
-  @keyframes remoteCorrect {
-    0%, 100% { box-shadow: inset 0 0 0 0 rgba(0,217,163,0); }
-    50% { box-shadow: inset 0 0 0 4px rgba(0,217,163,1); background: rgba(0,217,163,0.4); }
-  }
-  .sudoku-cell.remote-wrong {
-    animation: remoteWrong 0.7s ease;
-  }
-  @keyframes remoteWrong {
-    0%, 100% { box-shadow: inset 0 0 0 0 rgba(255,71,87,0); }
-    50% { box-shadow: inset 0 0 0 4px rgba(255,71,87,1); }
-  }
-  .sudoku-cell.remote-error-value {
-    background: rgba(255,71,87,0.85) !important;
-    color: white !important;
   }
   .sudoku-cell.border-right {
     margin-right: 2px;
@@ -1270,6 +1381,51 @@
     margin: 0 auto;
   }
 
+  .sudoku-leave-btn {
+    display: block;
+    margin: 16px auto 0;
+    padding: 13px 60px;
+    background: linear-gradient(135deg, var(--danger), #ff6b7a);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 6px 20px rgba(255,71,87,0.4);
+  }
+  .sudoku-leave-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,71,87,0.5); }
+
+  .race-result-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(108,92,231,0.1);
+    margin-bottom: 10px;
+    border: 2px solid var(--border);
+    text-align: left;
+  }
+  .race-result-row.winner {
+    background: linear-gradient(135deg, rgba(0,217,163,0.2), rgba(108,92,231,0.15));
+    border-color: var(--success);
+    box-shadow: 0 0 20px rgba(0,217,163,0.3);
+  }
+  .race-result-row .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(108,92,231,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  .race-result-row .info { flex: 1; min-width: 0; }
+  .race-result-row .name { font-weight: 800; font-size: 1rem; }
+  .race-result-row .progress-text { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+  .race-result-row .medal { font-size: 2rem; }
+
   .hidden { display: none !important; }
 
   ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -1296,6 +1452,8 @@
     .section-title { font-size: 1.25rem; }
     .round-options { grid-template-columns: repeat(5, 1fr); gap: 5px; }
     .round-option { padding: 10px 4px; font-size: 0.85rem; }
+    .hearts-options { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+    .heart-option { padding: 10px 4px; font-size: 0.85rem; }
     .room-ready-code { font-size: 2rem; letter-spacing: 8px; text-indent: 8px; padding: 15px 20px; }
     .achievements-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
     .achievement { font-size: 1.2rem; }
@@ -1335,6 +1493,7 @@
     .sudoku-numpad { width: min(60vw, 440px); }
     .sudoku-status-bar { width: min(60vw, 440px); }
     .sudoku-points-bar { width: min(60vw, 440px); }
+    .sudoku-race-panel { width: min(70vw, 500px); }
   }
 </style>
 </head>
@@ -1494,8 +1653,8 @@
       </div>
       <div class="game-select-card" onclick="selectGame('sudoku')">
         <span class="game-icon">🧩</span>
-        <div class="game-name">Sudoku</div>
-        <div class="game-desc">Challenge your friend to a number puzzle</div>
+        <div class="game-name">Sudoku Race</div>
+        <div class="game-desc">Race your friend — finish first to win!</div>
       </div>
     </div>
   </div>
@@ -1533,7 +1692,6 @@
   </div>
 
   <div class="page" id="pageSudokuGame">
-    <button class="back-btn" onclick="endSudokuGame()">← Back to Sudoku Menu</button>
     <div class="sudoku-game-screen active" id="sudokuGameScreen">
       <div class="sudoku-players-bar">
         <div class="sudoku-player-chip" id="sudokuChip1" onclick="openPlayerProfileFromGame(1)">
@@ -1543,6 +1701,33 @@
         <div class="sudoku-player-chip" id="sudokuChip2" onclick="openPlayerProfileFromGame(2)">
           <div class="chip-avatar" id="sudokuChipAvatar2">👤</div>
           <span id="sudokuChipName2">Waiting...</span>
+        </div>
+      </div>
+
+      <div class="sudoku-race-panel">
+        <div class="race-row" id="raceRow1">
+          <div class="race-row-header">
+            <span class="name-wrap">
+              <span class="avatar" id="raceAvatar1">🦁</span>
+              <span id="raceName1">Player 1</span>
+            </span>
+            <span class="percent" id="racePercent1">0%</span>
+          </div>
+          <div class="race-bar">
+            <div class="race-bar-fill" id="raceFill1"></div>
+          </div>
+        </div>
+        <div class="race-row me" id="raceRow2">
+          <div class="race-row-header">
+            <span class="name-wrap">
+              <span class="avatar" id="raceAvatar2">👤</span>
+              <span id="raceName2">You</span>
+            </span>
+            <span class="percent" id="racePercent2">0%</span>
+          </div>
+          <div class="race-bar">
+            <div class="race-bar-fill me" id="raceFill2"></div>
+          </div>
         </div>
       </div>
 
@@ -1567,6 +1752,8 @@
         <button class="sudoku-num-btn" onclick="sudokuInput(8)">8</button>
         <button class="sudoku-num-btn" onclick="sudokuInput(9)">9</button>
       </div>
+
+      <button class="sudoku-leave-btn" onclick="confirmLeaveSudoku()">Leave Game</button>
     </div>
   </div>
 
@@ -1581,20 +1768,18 @@
     <div class="player-panel" id="panel1">
       <div class="player-header">
         <span class="player-name" id="name1">Player 1</span>
-        <div class="player-lives" id="lives1">
-          <span class="heart active">❤️</span>
-          <span class="heart active">❤️</span>
-          <span class="heart active">❤️</span>
-        </div>
+        <div class="player-lives" id="lives1"></div>
       </div>
       <div class="image-box">
         <div class="emoji-display" id="emoji1">❓</div>
         <div class="category-badge" id="cat1">-</div>
+        <div class="image-name-en" id="imgName1"></div>
+        <div class="image-name-ar" id="imgAr1"></div>
         <div class="hint-text" id="hint1">Your image</div>
       </div>
       <div class="player-actions">
-        <button class="btn btn-outline" onclick="openAsk(1)">❓ Ask Question</button>
-        <button class="btn btn-success" onclick="openAnswer(1)">✅ Answer</button>
+        <button class="btn btn-outline" id="askBtn1" onclick="openAsk(1)">❓ Ask Question</button>
+        <button class="btn btn-success" id="answerBtn1" onclick="openAnswer(1)">✅ Answer</button>
       </div>
       <div class="answer-area" id="answerArea1">
         <input type="text" id="answerText1" placeholder="Opponent's image name">
@@ -1605,20 +1790,18 @@
     <div class="player-panel" id="panel2">
       <div class="player-header">
         <span class="player-name" id="name2">Player 2</span>
-        <div class="player-lives" id="lives2">
-          <span class="heart active">❤️</span>
-          <span class="heart active">❤️</span>
-          <span class="heart active">❤️</span>
-        </div>
+        <div class="player-lives" id="lives2"></div>
       </div>
       <div class="image-box">
         <div class="emoji-display" id="emoji2">❓</div>
         <div class="category-badge" id="cat2">-</div>
+        <div class="image-name-en" id="imgName2"></div>
+        <div class="image-name-ar" id="imgAr2"></div>
         <div class="hint-text" id="hint2">Your image</div>
       </div>
       <div class="player-actions">
-        <button class="btn btn-outline" onclick="openAsk(2)">❓ Ask Question</button>
-        <button class="btn btn-success" onclick="openAnswer(2)">✅ Answer</button>
+        <button class="btn btn-outline" id="askBtn2" onclick="openAsk(2)">❓ Ask Question</button>
+        <button class="btn btn-success" id="answerBtn2" onclick="openAnswer(2)">✅ Answer</button>
       </div>
       <div class="answer-area" id="answerArea2">
         <input type="text" id="answerText2" placeholder="Opponent's image name">
@@ -1631,8 +1814,19 @@
       <div id="chatMessages"></div>
     </div>
 
-    <div style="grid-column: 1/-1; text-align:center; margin-top:10px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-      <button class="btn btn-danger" onclick="endGame()">Leave Game</button>
+    <div style="grid-column: 1/-1; text-align:center; margin-top:10px;">
+      <button class="btn btn-danger" style="padding:13px 60px;" onclick="confirmLeaveRevealMe()">Leave Game</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmLeaveModal">
+  <div class="modal" style="max-width:400px; padding:30px;">
+    <h2 style="font-size:1.4rem; margin-bottom:12px;">Leave Game?</h2>
+    <p style="margin-bottom:22px; color:var(--text-muted);">Are you sure you want to leave the current match?</p>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-success" style="flex:1;" onclick="confirmLeaveYes()">Leave</button>
+      <button class="btn btn-danger" style="flex:1;" onclick="confirmLeaveNo()">Cancel</button>
     </div>
   </div>
 </div>
@@ -1642,6 +1836,7 @@
     <div class="winner-emoji" id="winnerEmoji">🏆</div>
     <h2 id="winnerTitle">Victory!</h2>
     <p id="winnerText"></p>
+    <div id="raceResults"></div>
     <button class="btn btn-success" style="width:100%" onclick="closeWinnerAndReset()">New Game</button>
   </div>
 </div>
@@ -1654,6 +1849,11 @@
     <div class="settings-section">
       <label>Number of Rounds</label>
       <div class="round-options" id="roundOptions"></div>
+    </div>
+
+    <div class="settings-section">
+      <label>Hearts (Lives)</label>
+      <div class="hearts-options" id="heartsOptions"></div>
     </div>
 
     <div class="settings-section">
@@ -1741,8 +1941,11 @@ let currentRoom = null;
 let currentInvite = null;
 let currentSudokuGame = null;
 let timerInterval = null;
-let settingsState = { category: null, rounds: 3, timerEnabled: false, timerSeconds: 90 };
+let settingsState = { category: null, rounds: 3, hearts: 3, timerEnabled: false, timerSeconds: 90 };
 let currentSudokuPoints = 0;
+let roomOpened = false;
+let roomPollInterval = null;
+let leaveTarget = null;
 
 let sudokuState = {
   grid: [],
@@ -1751,8 +1954,9 @@ let sudokuState = {
   selectedCol: -1,
   myPlayerNum: 1,
   mistakes: 0,
-  wrongCells: {},      // key -> true (persistent red)
-  lastCorrectCell: null, // key
+  wrongCells: {},
+  lockedCells: {},
+  lastCorrectCell: null,
   flashCells: {}
 };
 
@@ -1843,8 +2047,7 @@ const SUDOKU_PUZZLES = {
     { puzzle: "100489006730000040000001295007120600500703008006085700914600000020000037800512004", solution: "152489376739256841468371295387124659591763428246985713914637582625898137873512964" },
     { puzzle: "020608000580009700000040000370000500600000004008000013000020000009800036000306090", solution: "123678945584239761967145328372461589691583274458792613836924157219857436745316892" },
     { puzzle: "000075400000000008080190000300001060000000034000068170204000603900000020530200000", solution: "693475421745312698182196357329751864456923134871684179214537986967848512538269743" },
-    { puzzle: "000000010400000000020000000000050407008000300001090000300400200050100000000806000", solution: "693784512487512936125963874932651487568247391741398625319475268856129743274836159" },
-    { puzzle: "800000000003600000070090200050007000000045700000100030001000068008500010090000400", solution: "812753649943682175675491283154237896369845721287169534521974368438526917796318452" }
+    { puzzle: "000000010400000000020000000000050407008000300001090000300400200050100000000806000", solution: "693784512487512936125963874932651487568247391741398625319475268856129743274836159" }
   ]
 };
 
@@ -2285,8 +2488,10 @@ async function logout() {
   if (friendsChannel) { await supa.removeChannel(friendsChannel); friendsChannel = null; }
   if (invitesChannel) { await supa.removeChannel(invitesChannel); invitesChannel = null; }
   if (sudokuChannel) { await supa.removeChannel(sudokuChannel); sudokuChannel = null; }
+  stopRoomPolling();
   stopTimer();
   currentUser = null; currentUserId = null; currentProfile = null; currentRoom = null; currentGame = null; currentSudokuGame = null;
+  roomOpened = false;
   document.getElementById('authScreen').style.display = 'flex';
   document.getElementById('gameScreen').style.display = 'none';
   document.getElementById('avatarBtn').classList.add('hidden');
@@ -2550,6 +2755,7 @@ function openSettings(categoryKey, game) {
   settingsState.category = categoryKey;
   settingsState.game = game;
   settingsState.rounds = 3;
+  settingsState.hearts = 3;
   settingsState.timerEnabled = false;
   settingsState.timerSeconds = 90;
 
@@ -2569,6 +2775,20 @@ function openSettings(categoryKey, game) {
       settingsState.rounds = i;
     };
     roundsContainer.appendChild(opt);
+  }
+
+  const heartsContainer = document.getElementById('heartsOptions');
+  heartsContainer.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const opt = document.createElement('div');
+    opt.className = 'heart-option' + (i === 3 ? ' selected' : '');
+    opt.textContent = i;
+    opt.onclick = () => {
+      heartsContainer.querySelectorAll('.heart-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      settingsState.hearts = i;
+    };
+    heartsContainer.appendChild(opt);
   }
 
   document.getElementById('timerToggle').checked = false;
@@ -2618,12 +2838,15 @@ async function createSudokuRoom(difficulty) {
 
   const code = generateRoomCode();
 
+  const puzzles = SUDOKU_PUZZLES[actualDiff];
+  const chosen = puzzles[Math.floor(Math.random() * puzzles.length)];
+
   const { data, error } = await supa.from('rooms').insert({
     code,
     category: 'sudoku_' + actualDiff,
     player1_id: currentUserId,
     player1_name: currentProfile?.username || currentUser,
-    player1_image: { name: 'Sudoku', emoji: '🧩', _cat: 'sudoku' },
+    player1_image: { name: 'Sudoku', emoji: '🧩', _cat: 'sudoku', puzzle: chosen.puzzle, solution: chosen.solution },
     player2_image: { name: 'Sudoku', emoji: '🧩', _cat: 'sudoku' },
     status: 'waiting',
     rounds: 1,
@@ -2640,6 +2863,7 @@ async function createSudokuRoom(difficulty) {
 
   currentRoom = data;
   currentGame = 'sudoku';
+  roomOpened = false;
   showRoomReadyModal(code, 'sudoku');
   listenToRoom(data.id);
 }
@@ -2668,9 +2892,12 @@ async function confirmCreateRoom() {
     player2_image: img2,
     status: 'waiting',
     rounds: settingsState.rounds,
+    player1_lives: settingsState.hearts,
+    player2_lives: settingsState.hearts,
     timer_enabled: settingsState.timerEnabled,
     timer_seconds: settingsState.timerSeconds,
-    current_round: 1
+    current_round: 1,
+    current_turn: 1
   }).select().single();
 
   if (error) {
@@ -2681,6 +2908,7 @@ async function confirmCreateRoom() {
 
   currentRoom = data;
   closeSettings();
+  roomOpened = false;
   showRoomReadyModal(code, 'revealme');
   listenToRoom(data.id);
 }
@@ -2690,6 +2918,46 @@ function showRoomReadyModal(code, game) {
   document.getElementById('roomReadyIcon').textContent = game === 'sudoku' ? '🧩' : '🎮';
   document.getElementById('roomReadyTitle').textContent = game === 'sudoku' ? 'Sudoku Room!' : 'Room Created!';
   document.getElementById('roomReadyModal').classList.add('active');
+  startRoomPolling();
+}
+
+function startRoomPolling() {
+  stopRoomPolling();
+  roomPollInterval = setInterval(async () => {
+    if (roomOpened || !currentRoom) {
+      stopRoomPolling();
+      return;
+    }
+    const { data } = await supa.from('rooms').select('*').eq('id', currentRoom.id).maybeSingle();
+    if (data && data.status === 'playing' && data.player2_id) {
+      stopRoomPolling();
+      currentRoom = data;
+      openGameFromCurrentRoom();
+    }
+  }, 1500);
+}
+
+function stopRoomPolling() {
+  if (roomPollInterval) {
+    clearInterval(roomPollInterval);
+    roomPollInterval = null;
+  }
+}
+
+async function openGameFromCurrentRoom() {
+  if (roomOpened) return;
+  roomOpened = true;
+  document.getElementById('roomReadyModal').classList.remove('active');
+
+  if (currentRoom.category && currentRoom.category.startsWith('sudoku_')) {
+    currentGame = 'sudoku';
+    document.getElementById('appLogo').textContent = 'Sudoku';
+    await initSudokuGame();
+  } else {
+    currentGame = 'revealme';
+    document.getElementById('appLogo').textContent = 'RevealMe';
+    enterOnlineGame();
+  }
 }
 
 function copyRoomCodeNew(btn) {
@@ -2702,6 +2970,7 @@ function copyRoomCodeNew(btn) {
 }
 
 async function cancelRoom() {
+  stopRoomPolling();
   document.getElementById('roomReadyModal').classList.remove('active');
   if (currentRoom) {
     await supa.from('rooms').delete().eq('id', currentRoom.id);
@@ -2732,6 +3001,7 @@ async function joinRoomFromInput() {
   if (joinErr) { showToast('Error: ' + joinErr.message, 'error'); return; }
 
   currentRoom = updated;
+  roomOpened = true;
   document.getElementById('roomReadyModal').classList.remove('active');
 
   if (updated.category && updated.category.startsWith('sudoku_')) {
@@ -2765,6 +3035,7 @@ async function joinSudokuRoom() {
 
   currentRoom = updated;
   currentGame = 'sudoku';
+  roomOpened = true;
   document.getElementById('appLogo').textContent = 'Sudoku';
   await initSudokuGame();
 }
@@ -2778,21 +3049,14 @@ function listenToRoom(roomId) {
       event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}`
     }, async (payload) => {
       const room = payload.new;
-      const wasWaiting = currentRoom?.status === 'waiting';
       currentRoom = room;
-      // فتح اللعبة تلقائياً للداعي عند انضمام اللاعب الثاني
-      if (room.status === 'playing' && room.player2_id && wasWaiting) {
-        document.getElementById('roomReadyModal').classList.remove('active');
-        if (room.category && room.category.startsWith('sudoku_')) {
-          currentGame = 'sudoku';
-          document.getElementById('appLogo').textContent = 'Sudoku';
-          await initSudokuGame();
-        } else {
-          currentGame = 'revealme';
-          document.getElementById('appLogo').textContent = 'RevealMe';
-          enterOnlineGame();
-        }
+
+      if (!roomOpened && room.status === 'playing' && room.player2_id) {
+        stopRoomPolling();
+        openGameFromCurrentRoom();
+        return;
       }
+
       if (room.status === 'playing' && !room.category?.startsWith('sudoku_')) {
         updateLives();
         updateRoundInfo();
@@ -2805,12 +3069,38 @@ function listenToRoom(roomId) {
     .subscribe();
 }
 
+function calculateProgress(gridStr, puzzleStr) {
+  if (!gridStr || !puzzleStr) return 0;
+  const puzzle = stringToGrid(puzzleStr);
+  const grid = stringToGrid(gridStr);
+  let totalBlanks = 0;
+  let filled = 0;
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (puzzle[r][c] === 0) {
+        totalBlanks++;
+        if (grid[r][c] !== 0) filled++;
+      }
+    }
+  }
+  if (totalBlanks === 0) return 100;
+  return Math.round((filled / totalBlanks) * 100);
+}
+
 async function initSudokuGame() {
   const difficulty = currentRoom.category.replace('sudoku_', '');
-  const puzzles = SUDOKU_PUZZLES[difficulty] || SUDOKU_PUZZLES.easy;
-  const chosen = puzzles[Math.floor(Math.random() * puzzles.length)];
+  const p1Img = currentRoom.player1_image || {};
+  let puzzleStr = p1Img.puzzle;
+  let solutionStr = p1Img.solution;
 
-  const { data: existing, error: checkErr } = await supa.from('sudoku_games')
+  if (!puzzleStr || !solutionStr) {
+    const puzzles = SUDOKU_PUZZLES[difficulty] || SUDOKU_PUZZLES.easy;
+    const chosen = puzzles[Math.floor(Math.random() * puzzles.length)];
+    puzzleStr = chosen.puzzle;
+    solutionStr = chosen.solution;
+  }
+
+  const { data: existing } = await supa.from('sudoku_games')
     .select('*').eq('room_id', currentRoom.id).maybeSingle();
 
   if (existing) {
@@ -2819,10 +3109,10 @@ async function initSudokuGame() {
     const { data: created, error } = await supa.from('sudoku_games').insert({
       room_id: currentRoom.id,
       difficulty: difficulty,
-      puzzle: chosen.puzzle,
-      solution: chosen.solution,
-      player1_grid: chosen.puzzle,
-      player2_grid: chosen.puzzle
+      puzzle: puzzleStr,
+      solution: solutionStr,
+      player1_grid: puzzleStr,
+      player2_grid: puzzleStr
     }).select().single();
 
     if (error) {
@@ -2836,13 +3126,17 @@ async function initSudokuGame() {
   sudokuState.mistakes = 0;
   sudokuState.flashCells = {};
   sudokuState.wrongCells = {};
+  sudokuState.lockedCells = {};
   sudokuState.lastCorrectCell = null;
+  sudokuState.selectedRow = -1;
+  sudokuState.selectedCol = -1;
   currentSudokuPoints = SUDOKU_DIFFICULTIES[difficulty]?.maxPoints || 50;
 
   showPage('pageSudokuGame');
   renderSudokuBoard();
   renderSudokuInfo();
   updatePointsBar();
+  updateRaceBars();
   listenSudokuRealtime();
 }
 
@@ -2870,11 +3164,26 @@ function renderSudokuInfo() {
       p2Avatar.textContent = p2?.avatar || '👤';
       if (p1?.username) p1Name.textContent = p1.username;
       if (p2?.username) p2Name.textContent = p2.username;
+
+      document.getElementById('raceAvatar1').textContent = p1?.avatar || '👤';
+      document.getElementById('raceAvatar2').textContent = p2?.avatar || '👤';
+      const isP1Me = isP1;
+      document.getElementById('raceName1').textContent = (p1?.username || 'Player 1') + (isP1Me ? ' (You)' : '');
+      document.getElementById('raceName2').textContent = (p2?.username || 'Player 2') + (!isP1Me ? ' (You)' : '');
+
+      const meRow = isP1 ? document.getElementById('raceRow1') : document.getElementById('raceRow2');
+      const otherRow = isP1 ? document.getElementById('raceRow2') : document.getElementById('raceRow1');
+      const meFill = isP1 ? document.getElementById('raceFill1') : document.getElementById('raceFill2');
+      const otherFill = isP1 ? document.getElementById('raceFill2') : document.getElementById('raceFill1');
+      meRow.classList.add('me');
+      otherRow.classList.remove('me');
+      meFill.classList.add('me');
+      otherFill.classList.remove('me');
     }
   });
 
   if (currentRoom.status === 'playing') {
-    document.getElementById('sudokuStatus').textContent = 'Solve the puzzle together!';
+    document.getElementById('sudokuStatus').textContent = '🏁 Race your friend — finish first!';
     document.getElementById('sudokuChip1').classList.add('active');
     document.getElementById('sudokuChip2').classList.add('active');
   } else {
@@ -2882,6 +3191,17 @@ function renderSudokuInfo() {
     document.getElementById('sudokuChip1').classList.add('active');
     document.getElementById('sudokuChip2').classList.remove('active');
   }
+}
+
+function updateRaceBars() {
+  if (!currentSudokuGame || !currentRoom) return;
+  const p1Progress = calculateProgress(currentSudokuGame.player1_grid, currentSudokuGame.puzzle);
+  const p2Progress = calculateProgress(currentSudokuGame.player2_grid, currentSudokuGame.puzzle);
+
+  document.getElementById('raceFill1').style.width = p1Progress + '%';
+  document.getElementById('raceFill2').style.width = p2Progress + '%';
+  document.getElementById('racePercent1').textContent = p1Progress + '%';
+  document.getElementById('racePercent2').textContent = p2Progress + '%';
 }
 
 function updatePointsBar() {
@@ -2929,18 +3249,15 @@ function renderSudokuBoard() {
       if (sudokuState.fixed[r][c]) {
         cell.classList.add('fixed');
         cell.textContent = val;
+      } else if (sudokuState.lockedCells[key]) {
+        cell.classList.add('user-locked');
+        cell.textContent = val;
       } else if (val !== 0) {
         cell.textContent = val;
       }
-      // Persistent wrong state (from own or remote)
-      if (sudokuState.wrongCells[key]) {
-        cell.classList.add('error-value');
-      }
-      // Flash animations
+      if (sudokuState.wrongCells[key]) cell.classList.add('error-value');
       if (sudokuState.flashCells[key] === 'correct') cell.classList.add('correct-flash');
       if (sudokuState.flashCells[key] === 'wrong') cell.classList.add('wrong-flash');
-      if (sudokuState.flashCells[key] === 'remote-correct') cell.classList.add('remote-correct');
-      if (sudokuState.flashCells[key] === 'remote-wrong') cell.classList.add('remote-wrong');
 
       if (c === 2 || c === 5) cell.classList.add('border-right');
       if (r === 2 || r === 5) cell.classList.add('border-bottom');
@@ -2953,6 +3270,8 @@ function renderSudokuBoard() {
 
 function selectSudokuCell(r, c) {
   if (sudokuState.fixed[r]?.[c]) return;
+  const key = `${r}-${c}`;
+  if (sudokuState.lockedCells[key]) return;
   if (currentRoom?.status !== 'playing') return;
   sudokuState.selectedRow = r;
   sudokuState.selectedCol = c;
@@ -2964,34 +3283,32 @@ async function sudokuInput(num) {
   const c = sudokuState.selectedCol;
   if (r < 0 || c < 0) return;
   if (sudokuState.fixed[r][c]) return;
+  const key = `${r}-${c}`;
+  if (sudokuState.lockedCells[key]) return;
   if (currentRoom?.status !== 'playing') return;
 
   const solutionGrid = stringToGrid(currentSudokuGame.solution);
   const correctValue = solutionGrid[r][c];
-  const key = `${r}-${c}`;
 
   const testGrid = sudokuState.grid.map(row => [...row]);
   testGrid[r][c] = num;
   const validByRules = isSudokuValid(testGrid, r, c, num);
 
   if (num === 0) {
-    // Remove
     sudokuState.grid[r][c] = 0;
     delete sudokuState.flashCells[key];
     delete sudokuState.wrongCells[key];
   } else if (num === correctValue && validByRules) {
-    // Correct
-    // Clear previous correct flash from last correct cell
     if (sudokuState.lastCorrectCell && sudokuState.lastCorrectCell !== key) {
       delete sudokuState.flashCells[sudokuState.lastCorrectCell];
     }
     sudokuState.grid[r][c] = num;
     sudokuState.flashCells[key] = 'correct';
+    sudokuState.lockedCells[key] = true;
     sudokuState.lastCorrectCell = key;
     delete sudokuState.wrongCells[key];
     sudokuState.selectedRow = -1;
     sudokuState.selectedCol = -1;
-    // Remove flash after animation
     setTimeout(() => {
       if (sudokuState.flashCells[key] === 'correct') {
         delete sudokuState.flashCells[key];
@@ -2999,12 +3316,10 @@ async function sudokuInput(num) {
       }
     }, 900);
   } else {
-    // Wrong - stays red until changed
     sudokuState.mistakes++;
     sudokuState.flashCells[key] = 'wrong';
     sudokuState.wrongCells[key] = true;
     sudokuState.grid[r][c] = num;
-    // Remove flash class after animation but keep wrongCells for persistent red
     setTimeout(() => {
       delete sudokuState.flashCells[key];
       renderSudokuBoard();
@@ -3015,37 +3330,93 @@ async function sudokuInput(num) {
   const gridStr = gridToString(sudokuState.grid);
   const field = sudokuState.myPlayerNum === 1 ? 'player1_grid' : 'player2_grid';
 
-  await supa.from('sudoku_games').update({
+  const { error } = await supa.from('sudoku_games').update({
     [field]: gridStr,
     last_moved_by: currentUserId,
     last_move_at: new Date().toISOString()
   }).eq('id', currentSudokuGame.id);
 
-  currentSudokuGame[field] = gridStr;
+  if (!error) {
+    currentSudokuGame[field] = gridStr;
+  }
 
   renderSudokuBoard();
   updatePointsBar();
+  updateRaceBars();
   checkSudokuWin();
 }
 
 async function checkSudokuWin() {
-  if (!currentSudokuGame) return;
+  if (!currentSudokuGame || currentSudokuGame.status === 'finished') return;
   const p1Grid = currentSudokuGame.player1_grid;
   const p2Grid = currentSudokuGame.player2_grid;
   const solution = currentSudokuGame.solution;
 
-  if (p1Grid === solution && p2Grid === solution) {
-    await updateProfileStats(true, currentSudokuPoints);
+  const p1Won = p1Grid === solution;
+  const p2Won = p2Grid === solution;
+
+  if (p1Won || p2Won) {
+    const winnerNum = p1Won ? 1 : 2;
     await supa.from('rooms').update({ status: 'finished' }).eq('id', currentRoom.id);
     await supa.from('sudoku_games').update({ status: 'finished' }).eq('id', currentSudokuGame.id);
-    showSudokuWinModal(currentSudokuPoints);
+
+    const isWinner = (winnerNum === 1 && currentRoom.player1_id === currentUserId) ||
+                     (winnerNum === 2 && currentRoom.player2_id === currentUserId);
+
+    if (isWinner) {
+      await updateProfileStats(true, currentSudokuPoints);
+    } else {
+      await updateProfileStats(false, 0);
+    }
+
+    showSudokuRaceResult(winnerNum);
   }
 }
 
-function showSudokuWinModal(points) {
-  document.getElementById('winnerEmoji').textContent = '🎉';
-  document.getElementById('winnerTitle').textContent = 'Puzzle Solved!';
-  document.getElementById('winnerText').innerHTML = `You and your partner solved the Sudoku!<br><br>+${points} points earned!`;
+async function showSudokuRaceResult(winnerNum) {
+  const p1Progress = calculateProgress(currentSudokuGame.player1_grid, currentSudokuGame.puzzle);
+  const p2Progress = calculateProgress(currentSudokuGame.player2_grid, currentSudokuGame.puzzle);
+
+  let p1Avatar = '👤', p2Avatar = '👤';
+  try {
+    const { data } = await supa.from('profiles').select('id, avatar').in('id', [currentRoom.player1_id, currentRoom.player2_id].filter(Boolean));
+    if (data) {
+      const map = {};
+      data.forEach(p => map[p.id] = p);
+      p1Avatar = map[currentRoom.player1_id]?.avatar || '👤';
+      p2Avatar = map[currentRoom.player2_id]?.avatar || '👤';
+    }
+  } catch (e) {}
+
+  const isP1Me = currentRoom.player1_id === currentUserId;
+  const iWon = (winnerNum === 1 && isP1Me) || (winnerNum === 2 && !isP1Me);
+
+  document.getElementById('winnerEmoji').textContent = iWon ? '🏆' : '🥈';
+  document.getElementById('winnerTitle').textContent = iWon ? 'You Won the Race!' : `${winnerNum === 1 ? currentRoom.player1_name : currentRoom.player2_name} Won!`;
+
+  document.getElementById('raceResults').innerHTML = `
+    <div class="race-result-row ${winnerNum === 1 ? 'winner' : ''}">
+      <div class="avatar">${p1Avatar}</div>
+      <div class="info">
+        <div class="name">${currentRoom.player1_name || 'Player 1'} ${isP1Me ? '(You)' : ''}</div>
+        <div class="progress-text">${p1Progress}% completed</div>
+      </div>
+      <div class="medal">${winnerNum === 1 ? '🥇' : '🥈'}</div>
+    </div>
+    <div class="race-result-row ${winnerNum === 2 ? 'winner' : ''}">
+      <div class="avatar">${p2Avatar}</div>
+      <div class="info">
+        <div class="name">${currentRoom.player2_name || 'Player 2'} ${!isP1Me ? '(You)' : ''}</div>
+        <div class="progress-text">${p2Progress}% completed</div>
+      </div>
+      <div class="medal">${winnerNum === 2 ? '🥇' : '🥈'}</div>
+    </div>
+  `;
+
+  document.getElementById('winnerText').innerHTML = iWon
+    ? `🏁 You finished first! +${currentSudokuPoints} points`
+    : `Better luck next time!`;
+
   document.getElementById('winnerModal').classList.add('active');
 }
 
@@ -3056,73 +3427,57 @@ function listenSudokuRealtime() {
     .on('postgres_changes', {
       event: 'UPDATE', schema: 'public', table: 'sudoku_games', filter: `id=eq.${currentSudokuGame.id}`
     }, (payload) => {
-      const oldP1 = currentSudokuGame.player1_grid;
-      const oldP2 = currentSudokuGame.player2_grid;
-      const oldMover = currentSudokuGame.last_moved_by;
       currentSudokuGame = payload.new;
 
-      if (currentSudokuGame.last_moved_by !== currentUserId && currentSudokuGame.last_moved_by !== oldMover) {
-        const oppField = sudokuState.myPlayerNum === 1 ? 'player2_grid' : 'player1_grid';
-        const oppOld = sudokuState.myPlayerNum === 1 ? oldP2 : oldP1;
-        const oppNew = currentSudokuGame[oppField];
-        if (oppOld !== oppNew) {
-          const basePuzzle = stringToGrid(currentSudokuGame.puzzle);
-          const solutionGrid = stringToGrid(currentSudokuGame.solution);
-          for (let i = 0; i < 81; i++) {
-            if (oppOld[i] !== oppNew[i]) {
-              const r = Math.floor(i / 9);
-              const c = i % 9;
-              if (basePuzzle[r][c] !== 0) continue;
-              const newVal = parseInt(oppNew[i]);
-              const key = `${r}-${c}`;
-              if (newVal === 0) {
-                delete sudokuState.wrongCells[key];
-                delete sudokuState.flashCells[key];
-              } else if (newVal === solutionGrid[r][c]) {
-                // Correct from opponent
-                if (sudokuState.lastCorrectCell && sudokuState.lastCorrectCell !== key) {
-                  delete sudokuState.flashCells[sudokuState.lastCorrectCell];
-                }
-                sudokuState.lastCorrectCell = key;
-                sudokuState.flashCells[key] = 'remote-correct';
-                delete sudokuState.wrongCells[key];
-                setTimeout(() => {
-                  if (sudokuState.flashCells[key] === 'remote-correct') {
-                    delete sudokuState.flashCells[key];
-                    renderSudokuBoard();
-                  }
-                }, 900);
-              } else {
-                // Wrong from opponent - persistent red
-                sudokuState.flashCells[key] = 'remote-wrong';
-                sudokuState.wrongCells[key] = true;
-                setTimeout(() => {
-                  delete sudokuState.flashCells[key];
-                  renderSudokuBoard();
-                }, 700);
-              }
-            }
-          }
-        }
+      if (currentSudokuGame.last_moved_by !== currentUserId) {
+        renderSudokuBoard();
       }
 
-      renderSudokuBoard();
+      updateRaceBars();
       checkSudokuWin();
     })
     .subscribe();
 }
 
+async function confirmLeaveSudoku() {
+  leaveTarget = 'sudoku';
+  document.getElementById('confirmLeaveModal').classList.add('active');
+}
+
+function confirmLeaveRevealMe() {
+  leaveTarget = 'revealme';
+  document.getElementById('confirmLeaveModal').classList.add('active');
+}
+
+function confirmLeaveYes() {
+  document.getElementById('confirmLeaveModal').classList.remove('active');
+  if (leaveTarget === 'sudoku') {
+    endSudokuGame();
+  } else {
+    endGame();
+  }
+  leaveTarget = null;
+}
+
+function confirmLeaveNo() {
+  document.getElementById('confirmLeaveModal').classList.remove('active');
+  leaveTarget = null;
+}
+
 async function endSudokuGame() {
   if (sudokuChannel) { supa.removeChannel(sudokuChannel); sudokuChannel = null; }
   if (realtimeChannel) { supa.removeChannel(realtimeChannel); realtimeChannel = null; }
+  stopRoomPolling();
   if (currentRoom) {
     await supa.from('rooms').delete().eq('id', currentRoom.id);
   }
   currentRoom = null;
   currentSudokuGame = null;
-  sudokuState = { grid: [], fixed: [], selectedRow: -1, selectedCol: -1, myPlayerNum: 1, mistakes: 0, wrongCells: {}, lastCorrectCell: null, flashCells: {} };
+  roomOpened = false;
+  sudokuState = { grid: [], fixed: [], selectedRow: -1, selectedCol: -1, myPlayerNum: 1, mistakes: 0, wrongCells: {}, lockedCells: {}, lastCorrectCell: null, flashCells: {} };
   currentGame = 'sudoku';
   document.getElementById('appLogo').textContent = 'Sudoku';
+  renderSudokuCategories();
   showPage('pageSudoku');
 }
 
@@ -3402,6 +3757,7 @@ async function acceptInvite() {
   await supa.from('invites').update({ status: 'accepted' }).eq('id', currentInvite.id);
   currentRoom = updated;
   currentInvite = null;
+  roomOpened = true;
 
   if (updated.category && updated.category.startsWith('sudoku_')) {
     currentGame = 'sudoku';
@@ -3421,6 +3777,18 @@ async function declineInvite() {
   document.getElementById('incomingInviteModal').classList.remove('active');
 }
 
+function buildHearts(container, total, current) {
+  container.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const span = document.createElement('span');
+    span.className = 'heart';
+    if (i < current) span.classList.add('active');
+    else span.classList.add('lost');
+    span.textContent = '❤️';
+    container.appendChild(span);
+  }
+}
+
 function enterOnlineGame() {
   document.getElementById('roomReadyModal').classList.remove('active');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -3436,13 +3804,21 @@ function enterOnlineGame() {
   document.getElementById(`name${oppNum}`).textContent = isP1 ? currentRoom.player2_name : currentRoom.player1_name;
 
   const myImg = isP1 ? currentRoom.player1_image : currentRoom.player2_image;
+
   document.getElementById(`emoji${myNum}`).textContent = myImg.emoji;
   document.getElementById(`cat${myNum}`).textContent = CATEGORIES[myImg._cat]?.name || myImg._cat;
+  document.getElementById(`imgName${myNum}`).textContent = myImg.en ? myImg.en : myImg.name;
+  document.getElementById(`imgAr${myNum}`).textContent = myImg.ar || '';
   document.getElementById(`hint${myNum}`).textContent = 'Your image';
 
   document.getElementById(`emoji${oppNum}`).textContent = '❓';
   document.getElementById(`cat${oppNum}`).textContent = 'Hidden';
+  document.getElementById(`imgName${oppNum}`).textContent = '';
+  document.getElementById(`imgAr${oppNum}`).textContent = '';
   document.getElementById(`hint${oppNum}`).textContent = 'Try to guess!';
+
+  document.getElementById('answerArea1').style.display = 'none';
+  document.getElementById('answerArea2').style.display = 'none';
 
   updateLives();
   updateRoundInfo();
@@ -3466,14 +3842,18 @@ function updateTurnUI() {
 
   const isMyTurn = currentRoom.current_turn === myNum;
 
-  // Buttons for both players
-  document.querySelectorAll(`#panel${myNum} .player-actions .btn`).forEach(b => b.disabled = !isMyTurn);
-  document.querySelectorAll(`#panel${oppNum} .player-actions .btn`).forEach(b => b.disabled = true);
+  const myAskBtn = document.getElementById(`askBtn${myNum}`);
+  const myAnswerBtn = document.getElementById(`answerBtn${myNum}`);
+  const oppAskBtn = document.getElementById(`askBtn${oppNum}`);
+  const oppAnswerBtn = document.getElementById(`answerBtn${oppNum}`);
 
-  const turnName = currentRoom.current_turn === 1
-    ? (isP1 ? (currentProfile?.username || currentUser) : currentRoom.player2_name)
-    : (isP1 ? currentRoom.player2_name : (currentProfile?.username || currentUser));
-  document.getElementById('turnIndicator').textContent = isMyTurn ? 'Your turn!' : `Turn: ${turnName}`;
+  if (myAskBtn) myAskBtn.disabled = !isMyTurn;
+  if (myAnswerBtn) myAnswerBtn.disabled = !isMyTurn;
+  if (oppAskBtn) oppAskBtn.disabled = true;
+  if (oppAnswerBtn) oppAnswerBtn.disabled = true;
+
+  const oppName = isP1 ? currentRoom.player2_name : currentRoom.player1_name;
+  document.getElementById('turnIndicator').textContent = isMyTurn ? 'Your turn!' : `Turn: ${oppName}`;
 
   document.getElementById(`panel${myNum}`).classList.toggle('active', isMyTurn);
   document.getElementById(`panel${oppNum}`).classList.remove('active');
@@ -3484,19 +3864,20 @@ function updateLives() {
   const isP1 = currentRoom.player1_id === currentUserId;
   const myLives = isP1 ? (currentRoom.player1_lives ?? 3) : (currentRoom.player2_lives ?? 3);
   const oppLives = isP1 ? (currentRoom.player2_lives ?? 3) : (currentRoom.player1_lives ?? 3);
+
+  const totalHearts = Math.max(
+    currentRoom.player1_lives ?? 3,
+    currentRoom.player2_lives ?? 3
+  );
+
   const myNum = isP1 ? 1 : 2;
   const oppNum = isP1 ? 2 : 1;
 
-  [myNum, oppNum].forEach((n, idx) => {
-    const lives = idx === 0 ? myLives : oppLives;
-    const container = document.getElementById(`lives${n}`);
-    if (!container) return;
-    const hearts = container.querySelectorAll('.heart');
-    hearts.forEach((h, i) => {
-      h.classList.toggle('active', i < lives);
-      h.classList.toggle('lost', i >= lives);
-    });
-  });
+  const myContainer = document.getElementById(`lives${myNum}`);
+  const oppContainer = document.getElementById(`lives${oppNum}`);
+
+  buildHearts(myContainer, totalHearts, myLives);
+  buildHearts(oppContainer, totalHearts, oppLives);
 }
 
 function updateRoundInfo() {
@@ -3563,15 +3944,19 @@ function getOpponentImage() {
   return isP1 ? currentRoom.player2_image : currentRoom.player1_image;
 }
 
-function openAsk(playerNum) {
+async function openAsk(playerNum) {
   if (!currentRoom) return;
   const myNum = getMyPlayerNum();
   if (myNum !== playerNum) return;
   if (currentRoom.current_turn !== playerNum) return;
 
-  // Pass turn immediately without asking input
-  advanceTurn();
-  showToast('Turn passed to opponent', 'success');
+  const nextTurn = currentRoom.current_turn === 1 ? 2 : 1;
+  const { data: updated, error } = await supa.from('rooms').update({ current_turn: nextTurn }).eq('id', currentRoom.id).select().single();
+  if (!error && updated) {
+    currentRoom = updated;
+    updateTurnUI();
+    showToast('Turn passed to opponent', 'success');
+  }
 }
 
 function openAnswer(playerNum) {
@@ -3611,8 +3996,8 @@ async function submitAnswer(playerNum) {
     return;
   } else {
     const newLives = myCurrentLives - 1;
-    await supa.from('rooms').update({ [myLivesField]: newLives }).eq('id', currentRoom.id);
-    currentRoom[myLivesField] = newLives;
+    const { data: updated } = await supa.from('rooms').update({ [myLivesField]: newLives }).eq('id', currentRoom.id).select().single();
+    if (updated) currentRoom = updated;
     updateLives();
 
     if (newLives <= 0) {
@@ -3631,13 +4016,16 @@ async function submitAnswer(playerNum) {
 
 function checkAnswer(text, image) {
   const t = text.toLowerCase().trim();
-  return t === image.ar?.toLowerCase() || t === image.en?.toLowerCase() || t === image.name?.toLowerCase();
+  return t === image.ar?.toLowerCase() ||
+         t === image.en?.toLowerCase() ||
+         t === image.name?.toLowerCase();
 }
 
 function showWinnerModal(iWon, opponentImage) {
   document.getElementById('winnerEmoji').textContent = '🏆';
   document.getElementById('winnerTitle').textContent = `${currentProfile?.username || currentUser} Wins!`;
   document.getElementById('winnerText').innerHTML = `You guessed correctly: <strong>${opponentImage.emoji} ${opponentImage.name}</strong>`;
+  document.getElementById('raceResults').innerHTML = '';
   document.getElementById('winnerModal').classList.add('active');
 }
 
@@ -3645,6 +4033,7 @@ function showLoserModal(opponentImage) {
   document.getElementById('winnerEmoji').textContent = '💔';
   document.getElementById('winnerTitle').textContent = 'Out of Lives!';
   document.getElementById('winnerText').innerHTML = `You ran out of lives. The opponent's image was: <strong>${opponentImage.emoji} ${opponentImage.name}</strong>`;
+  document.getElementById('raceResults').innerHTML = '';
   document.getElementById('winnerModal').classList.add('active');
 }
 
@@ -3655,8 +4044,10 @@ function closeWinnerAndReset() {
 
 function endGame() {
   stopTimer();
+  stopRoomPolling();
   if (realtimeChannel) { supa.removeChannel(realtimeChannel); realtimeChannel = null; }
   currentRoom = null;
+  roomOpened = false;
   roundUsedItems = [];
   document.getElementById('chatMessages').innerHTML = '';
   document.getElementById('roomInfo').innerHTML = '';
