@@ -337,6 +337,15 @@
   .game-select-card .game-name { font-size: 1.6rem; font-weight: 900; margin-bottom: 8px; }
   .game-select-card .game-desc { font-size: 0.9rem; color: var(--text-muted); }
 
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
   .back-btn {
     display: inline-flex;
     align-items: center;
@@ -350,9 +359,9 @@
     border-radius: 12px;
     cursor: pointer;
     font-weight: 700;
-    margin-bottom: 20px;
     transition: 0.3s;
     font-size: 0.95rem;
+    flex-shrink: 0;
   }
   .back-btn:hover { border-color: var(--primary); transform: translateX(-4px); }
 
@@ -461,11 +470,26 @@
     font-weight: 800;
     font-size: 1.15rem;
     box-shadow: 0 10px 30px var(--shadow);
-    animation: pulseGlow 2s ease-in-out infinite;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    gap: 16px;
   }
-  @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 10px 30px var(--shadow); }
-    50% { box-shadow: 0 10px 50px rgba(108,92,231,0.7); }
+  .turn-indicator .turn-text { flex: 1; }
+  .turn-indicator .turn-timer {
+    font-family: 'Courier New', monospace;
+    font-weight: 900;
+    font-size: 1.35rem;
+    background: rgba(0,0,0,0.25);
+    padding: 6px 16px;
+    border-radius: 20px;
+    min-width: 80px;
+  }
+  .turn-indicator .turn-timer.danger { background: rgba(255,71,87,0.4); animation: pulse 0.6s infinite; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
   }
   .round-info {
     text-align: center;
@@ -480,13 +504,6 @@
     justify-content: space-between;
     padding: 12px 20px;
   }
-  .timer-display {
-    font-family: 'Courier New', monospace;
-    font-weight: 900;
-    font-size: 1.3rem;
-    color: var(--warning);
-  }
-  .timer-display.danger { color: var(--danger); animation: pulse 0.5s infinite; }
 
   .player-panel {
     background: var(--card);
@@ -581,32 +598,84 @@
   .chat-msg.me { background: linear-gradient(135deg, rgba(108,92,231,0.3), rgba(108,92,231,0.15)); border-right: 3px solid var(--primary); margin-left: auto; text-align: right; }
   .chat-msg.other { background: rgba(0,217,163,0.15); border-right: 3px solid var(--success); }
 
-  .waiting-badge {
-    display: inline-flex;
+  .question-timer-modal .modal {
+    max-width: 420px !important;
+    padding: 40px !important;
+    position: relative;
+    overflow: hidden;
+  }
+  .question-timer-circle-wrap {
+    display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
-    background: rgba(108,92,231,0.15);
-    border: 2px solid var(--primary);
-    color: var(--text);
-    padding: 12px 24px;
-    border-radius: 30px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin-top: 18px;
+    margin-bottom: 25px;
+    position: relative;
   }
-  .waiting-dots { display: inline-flex; gap: 4px; }
-  .waiting-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+  .question-timer-circle {
+    position: relative;
+    width: 160px;
+    height: 160px;
+  }
+  .question-timer-circle svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  .question-timer-circle circle {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+  }
+  .question-timer-circle .bg-circle {
+    stroke: rgba(108,92,231,0.15);
+  }
+  .question-timer-circle .progress-circle {
+    stroke: url(#timerGradient);
+    transition: stroke-dashoffset 1s linear;
+  }
+  .question-timer-question-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--primary), var(--success));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: questionBounce 1.5s ease-in-out infinite;
+  }
+  @keyframes questionBounce {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -55%) scale(1.08); }
+  }
+  .question-timer-seconds {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Courier New', monospace;
+    font-weight: 900;
+    font-size: 1.5rem;
     background: var(--primary);
-    animation: bounceDot 1.4s ease-in-out infinite;
+    color: white;
+    padding: 6px 20px;
+    border-radius: 20px;
+    box-shadow: 0 6px 20px var(--shadow);
   }
-  .waiting-dot:nth-child(2) { animation-delay: 0.2s; }
-  .waiting-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounceDot {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
-    40% { transform: scale(1); opacity: 1; }
+  .question-timer-seconds.danger { background: var(--danger); animation: pulse 0.6s infinite; }
+  .question-timer-title {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+  }
+  .question-timer-sub {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 20px;
   }
 
   .profile-backdrop {
@@ -958,7 +1027,7 @@
 
   .timer-options {
     display: none;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
     margin-top: 10px;
   }
@@ -1291,7 +1360,7 @@
     user-select: none;
     aspect-ratio: 1;
   }
-  .sudoku-cell:hover { background: rgba(108,92,231,0.15); }
+  .sudoku-cell:hover:not(.fixed):not(.user-locked) { background: rgba(108,92,231,0.15); }
   .sudoku-cell.fixed {
     background: rgba(108,92,231,0.18);
     color: var(--text);
@@ -1299,7 +1368,7 @@
     font-weight: 900;
   }
   .sudoku-cell.user-locked {
-    background: linear-gradient(135deg, rgba(0,217,163,0.15), rgba(0,217,163,0.08));
+    background: rgba(0,217,163,0.25);
     color: var(--success);
     cursor: default;
     font-weight: 900;
@@ -1321,7 +1390,7 @@
   @keyframes correctFlash {
     0% { background: rgba(0,217,163,0.95); color: white; transform: scale(1.2); }
     50% { background: rgba(0,217,163,0.6); color: white; transform: scale(1.05); }
-    100% { background: var(--card-solid); color: var(--primary); transform: scale(1); }
+    100% { background: rgba(0,217,163,0.25); color: var(--success); transform: scale(1); }
   }
   .sudoku-cell.wrong-flash {
     animation: wrongFlash 0.7s ease;
@@ -1454,6 +1523,8 @@
     .round-option { padding: 10px 4px; font-size: 0.85rem; }
     .hearts-options { grid-template-columns: repeat(5, 1fr); gap: 5px; }
     .heart-option { padding: 10px 4px; font-size: 0.85rem; }
+    .timer-options { grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .timer-option { padding: 10px 4px; font-size: 0.85rem; }
     .room-ready-code { font-size: 2rem; letter-spacing: 8px; text-indent: 8px; padding: 15px 20px; }
     .achievements-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
     .achievement { font-size: 1.2rem; }
@@ -1660,7 +1731,9 @@
   </div>
 
   <div class="page" id="pageRevealMe">
-    <button class="back-btn" onclick="goHome()">← Back to Games</button>
+    <div class="page-header">
+      <button class="back-btn" onclick="goHome()">← Back to Games</button>
+    </div>
     <h2 class="section-title">Choose a Category</h2>
     <div class="categories-grid" id="categoriesGrid"></div>
 
@@ -1676,7 +1749,9 @@
   </div>
 
   <div class="page" id="pageSudoku">
-    <button class="back-btn" onclick="goHome()">← Back to Games</button>
+    <div class="page-header">
+      <button class="back-btn" onclick="goHome()">← Back to Games</button>
+    </div>
     <h2 class="section-title">Choose a Difficulty</h2>
     <div class="sudoku-grid" id="sudokuGrid"></div>
 
@@ -1758,11 +1833,13 @@
   </div>
 
   <div class="game-board" id="gameBoard">
-    <div class="turn-indicator" id="turnIndicator" style="grid-column: 1/-1;"></div>
+    <div class="turn-indicator" id="turnIndicator" style="grid-column: 1/-1;">
+      <span class="turn-text">Your turn!</span>
+      <span class="turn-timer" id="turnTimer" style="display: none;">30s</span>
+    </div>
 
     <div class="round-info" id="roundInfo" style="grid-column: 1/-1; display: none;">
       <span id="roundText">Round 1 / 3</span>
-      <span class="timer-display" id="timerDisplay" style="display: none;">60s</span>
     </div>
 
     <div class="player-panel" id="panel1">
@@ -1820,6 +1897,29 @@
   </div>
 </div>
 
+<div class="modal-overlay question-timer-modal" id="questionTimerModal">
+  <div class="modal">
+    <div class="question-timer-title" id="questionTimerTitle">Question Time!</div>
+    <div class="question-timer-sub">Ask your question and get the answer</div>
+    <div class="question-timer-circle-wrap">
+      <div class="question-timer-circle">
+        <svg viewBox="0 0 160 160">
+          <defs>
+            <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6c5ce7"/>
+              <stop offset="100%" stop-color="#00d9a3"/>
+            </linearGradient>
+          </defs>
+          <circle class="bg-circle" cx="80" cy="80" r="70"></circle>
+          <circle class="progress-circle" id="questionProgressCircle" cx="80" cy="80" r="70" stroke-dasharray="439.8" stroke-dashoffset="0"></circle>
+        </svg>
+        <div class="question-timer-question-mark">?</div>
+      </div>
+      <div class="question-timer-seconds" id="questionTimerSeconds">20</div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="confirmLeaveModal">
   <div class="modal" style="max-width:400px; padding:30px;">
     <h2 style="font-size:1.4rem; margin-bottom:12px;">Leave Game?</h2>
@@ -1858,16 +1958,17 @@
 
     <div class="settings-section">
       <div class="timer-toggle-row">
-        <span style="font-weight:700;">Enable Timer</span>
+        <span style="font-weight:700;">Enable Turn Timer</span>
         <label class="switch">
           <input type="checkbox" id="timerToggle" onchange="toggleTimerOptions()">
           <span class="slider"></span>
         </label>
       </div>
       <div class="timer-options" id="timerOptions">
-        <div class="timer-option" data-sec="30">30s</div>
+        <div class="timer-option" data-sec="15">15s</div>
+        <div class="timer-option selected" data-sec="30">30s</div>
+        <div class="timer-option" data-sec="45">45s</div>
         <div class="timer-option" data-sec="60">60s</div>
-        <div class="timer-option selected" data-sec="90">90s</div>
       </div>
     </div>
 
@@ -1940,11 +2041,17 @@ let sudokuChannel = null;
 let currentRoom = null;
 let currentInvite = null;
 let currentSudokuGame = null;
-let timerInterval = null;
-let settingsState = { category: null, rounds: 3, hearts: 3, timerEnabled: false, timerSeconds: 90 };
+let turnTimerInterval = null;
+let turnTimeRemaining = 0;
+let turnTimerActive = false;
+let questionTimerInterval = null;
+let questionTimeRemaining = 20;
+let settingsState = { category: null, rounds: 3, hearts: 3, timerEnabled: false, timerSeconds: 30 };
 let currentSudokuPoints = 0;
 let roomOpened = false;
 let roomPollInterval = null;
+let sudokuPollInterval = null;
+let roomStatePoll = null;
 let leaveTarget = null;
 
 let sudokuState = {
@@ -2072,22 +2179,6 @@ function stringToGrid(s) {
 
 function gridToString(g) {
   return g.flat().join('');
-}
-
-function isSudokuValid(grid, r, c, num) {
-  if (num === 0) return true;
-  for (let i = 0; i < 9; i++) {
-    if (i !== c && grid[r][i] === num) return false;
-    if (i !== r && grid[i][c] === num) return false;
-  }
-  const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
-      const rr = br + i, cc = bc + j;
-      if ((rr !== r || cc !== c) && grid[rr][cc] === num) return false;
-    }
-  }
-  return true;
 }
 
 function showToast(message, type = 'success') {
@@ -2489,7 +2580,10 @@ async function logout() {
   if (invitesChannel) { await supa.removeChannel(invitesChannel); invitesChannel = null; }
   if (sudokuChannel) { await supa.removeChannel(sudokuChannel); sudokuChannel = null; }
   stopRoomPolling();
-  stopTimer();
+  stopSudokuPoll();
+  stopRoomStatePoll();
+  stopTurnTimer();
+  stopQuestionTimer();
   currentUser = null; currentUserId = null; currentProfile = null; currentRoom = null; currentGame = null; currentSudokuGame = null;
   roomOpened = false;
   document.getElementById('authScreen').style.display = 'flex';
@@ -2757,7 +2851,7 @@ function openSettings(categoryKey, game) {
   settingsState.rounds = 3;
   settingsState.hearts = 3;
   settingsState.timerEnabled = false;
-  settingsState.timerSeconds = 90;
+  settingsState.timerSeconds = 30;
 
   const cat = CATEGORIES[categoryKey];
   document.getElementById('settingsCatEmoji').textContent = cat.emoji;
@@ -2794,7 +2888,7 @@ function openSettings(categoryKey, game) {
   document.getElementById('timerToggle').checked = false;
   document.getElementById('timerOptions').classList.remove('active');
   document.querySelectorAll('.timer-option').forEach(o => {
-    o.classList.toggle('selected', o.dataset.sec === '90');
+    o.classList.toggle('selected', o.dataset.sec === '30');
     o.onclick = () => {
       document.querySelectorAll('.timer-option').forEach(x => x.classList.remove('selected'));
       o.classList.add('selected');
@@ -2944,6 +3038,51 @@ function stopRoomPolling() {
   }
 }
 
+function startRoomStatePoll(intervalMs) {
+  stopRoomStatePoll();
+  roomStatePoll = setInterval(async () => {
+    if (!currentRoom) { stopRoomStatePoll(); return; }
+    const { data } = await supa.from('rooms').select('*').eq('id', currentRoom.id).maybeSingle();
+    if (data) {
+      currentRoom = data;
+      if (!data.category?.startsWith('sudoku_')) {
+        updateLives();
+        updateTurnUI();
+        if (data.timer_enabled && data.status === 'playing') {
+          restartTurnTimerIfNeeded();
+        }
+      }
+    }
+  }, 1000);
+}
+
+function stopRoomStatePoll() {
+  if (roomStatePoll) {
+    clearInterval(roomStatePoll);
+    roomStatePoll = null;
+  }
+}
+
+function startSudokuPoll(intervalMs) {
+  stopSudokuPoll();
+  sudokuPollInterval = setInterval(async () => {
+    if (!currentSudokuGame) { stopSudokuPoll(); return; }
+    const { data } = await supa.from('sudoku_games').select('*').eq('id', currentSudokuGame.id).maybeSingle();
+    if (data) {
+      currentSudokuGame = data;
+      updateRaceBars();
+      checkSudokuWin();
+    }
+  }, intervalMs || 1000);
+}
+
+function stopSudokuPoll() {
+  if (sudokuPollInterval) {
+    clearInterval(sudokuPollInterval);
+    sudokuPollInterval = null;
+  }
+}
+
 async function openGameFromCurrentRoom() {
   if (roomOpened) return;
   roomOpened = true;
@@ -3051,6 +3190,13 @@ function listenToRoom(roomId) {
       const room = payload.new;
       currentRoom = room;
 
+      if (room.status === 'finished') {
+        if (room.category?.startsWith('sudoku_')) {
+          checkSudokuWin();
+        }
+        return;
+      }
+
       if (!roomOpened && room.status === 'playing' && room.player2_id) {
         stopRoomPolling();
         openGameFromCurrentRoom();
@@ -3059,8 +3205,10 @@ function listenToRoom(roomId) {
 
       if (room.status === 'playing' && !room.category?.startsWith('sudoku_')) {
         updateLives();
-        updateRoundInfo();
         updateTurnUI();
+        if (room.timer_enabled) {
+          restartTurnTimerIfNeeded();
+        }
       }
     })
     .on('postgres_changes', {
@@ -3069,22 +3217,25 @@ function listenToRoom(roomId) {
     .subscribe();
 }
 
-function calculateProgress(gridStr, puzzleStr) {
-  if (!gridStr || !puzzleStr) return 0;
+function calculateProgress(gridStr, puzzleStr, solutionStr) {
+  if (!gridStr || !puzzleStr || !solutionStr) return 0;
   const puzzle = stringToGrid(puzzleStr);
   const grid = stringToGrid(gridStr);
+  const solution = stringToGrid(solutionStr);
   let totalBlanks = 0;
-  let filled = 0;
+  let correctFilled = 0;
   for (let r = 0; r < 9; r++) {
     for (let c = 0; c < 9; c++) {
       if (puzzle[r][c] === 0) {
         totalBlanks++;
-        if (grid[r][c] !== 0) filled++;
+        if (grid[r][c] !== 0 && grid[r][c] === solution[r][c]) {
+          correctFilled++;
+        }
       }
     }
   }
   if (totalBlanks === 0) return 100;
-  return Math.round((filled / totalBlanks) * 100);
+  return Math.round((correctFilled / totalBlanks) * 100);
 }
 
 async function initSudokuGame() {
@@ -3138,6 +3289,7 @@ async function initSudokuGame() {
   updatePointsBar();
   updateRaceBars();
   listenSudokuRealtime();
+  startSudokuPoll(1000);
 }
 
 function renderSudokuInfo() {
@@ -3195,8 +3347,8 @@ function renderSudokuInfo() {
 
 function updateRaceBars() {
   if (!currentSudokuGame || !currentRoom) return;
-  const p1Progress = calculateProgress(currentSudokuGame.player1_grid, currentSudokuGame.puzzle);
-  const p2Progress = calculateProgress(currentSudokuGame.player2_grid, currentSudokuGame.puzzle);
+  const p1Progress = calculateProgress(currentSudokuGame.player1_grid, currentSudokuGame.puzzle, currentSudokuGame.solution);
+  const p2Progress = calculateProgress(currentSudokuGame.player2_grid, currentSudokuGame.puzzle, currentSudokuGame.solution);
 
   document.getElementById('raceFill1').style.width = p1Progress + '%';
   document.getElementById('raceFill2').style.width = p2Progress + '%';
@@ -3290,15 +3442,11 @@ async function sudokuInput(num) {
   const solutionGrid = stringToGrid(currentSudokuGame.solution);
   const correctValue = solutionGrid[r][c];
 
-  const testGrid = sudokuState.grid.map(row => [...row]);
-  testGrid[r][c] = num;
-  const validByRules = isSudokuValid(testGrid, r, c, num);
-
   if (num === 0) {
     sudokuState.grid[r][c] = 0;
     delete sudokuState.flashCells[key];
     delete sudokuState.wrongCells[key];
-  } else if (num === correctValue && validByRules) {
+  } else if (num === correctValue) {
     if (sudokuState.lastCorrectCell && sudokuState.lastCorrectCell !== key) {
       delete sudokuState.flashCells[sudokuState.lastCorrectCell];
     }
@@ -3322,8 +3470,10 @@ async function sudokuInput(num) {
     sudokuState.grid[r][c] = num;
     setTimeout(() => {
       delete sudokuState.flashCells[key];
+      delete sudokuState.wrongCells[key];
+      sudokuState.grid[r][c] = 0;
       renderSudokuBoard();
-    }, 700);
+    }, 800);
     updatePointsBar();
   }
 
@@ -3374,8 +3524,8 @@ async function checkSudokuWin() {
 }
 
 async function showSudokuRaceResult(winnerNum) {
-  const p1Progress = calculateProgress(currentSudokuGame.player1_grid, currentSudokuGame.puzzle);
-  const p2Progress = calculateProgress(currentSudokuGame.player2_grid, currentSudokuGame.puzzle);
+  const p1Progress = calculateProgress(currentSudokuGame.player1_grid, currentSudokuGame.puzzle, currentSudokuGame.solution);
+  const p2Progress = calculateProgress(currentSudokuGame.player2_grid, currentSudokuGame.puzzle, currentSudokuGame.solution);
 
   let p1Avatar = '👤', p2Avatar = '👤';
   try {
@@ -3428,11 +3578,6 @@ function listenSudokuRealtime() {
       event: 'UPDATE', schema: 'public', table: 'sudoku_games', filter: `id=eq.${currentSudokuGame.id}`
     }, (payload) => {
       currentSudokuGame = payload.new;
-
-      if (currentSudokuGame.last_moved_by !== currentUserId) {
-        renderSudokuBoard();
-      }
-
       updateRaceBars();
       checkSudokuWin();
     })
@@ -3449,12 +3594,23 @@ function confirmLeaveRevealMe() {
   document.getElementById('confirmLeaveModal').classList.add('active');
 }
 
-function confirmLeaveYes() {
+async function confirmLeaveYes() {
   document.getElementById('confirmLeaveModal').classList.remove('active');
+  await fullCleanupRoom();
   if (leaveTarget === 'sudoku') {
-    endSudokuGame();
+    currentGame = 'sudoku';
+    document.getElementById('appLogo').textContent = 'Sudoku';
+    renderSudokuCategories();
+    showPage('pageSudoku');
+  } else if (leaveTarget === 'revealme') {
+    currentGame = 'revealme';
+    document.getElementById('appLogo').textContent = 'RevealMe';
+    renderRevealMeCategories();
+    showPage('pageRevealMe');
   } else {
-    endGame();
+    currentGame = null;
+    document.getElementById('appLogo').textContent = 'PlayHub';
+    showPage('pageGameSelect');
   }
   leaveTarget = null;
 }
@@ -3464,17 +3620,47 @@ function confirmLeaveNo() {
   leaveTarget = null;
 }
 
-async function endSudokuGame() {
-  if (sudokuChannel) { supa.removeChannel(sudokuChannel); sudokuChannel = null; }
-  if (realtimeChannel) { supa.removeChannel(realtimeChannel); realtimeChannel = null; }
+async function fullCleanupRoom() {
+  stopTurnTimer();
   stopRoomPolling();
+  stopSudokuPoll();
+  stopRoomStatePoll();
+  stopQuestionTimer();
+
+  if (sudokuChannel) { await supa.removeChannel(sudokuChannel); sudokuChannel = null; }
+  if (realtimeChannel) { await supa.removeChannel(realtimeChannel); realtimeChannel = null; }
+
   if (currentRoom) {
     await supa.from('rooms').delete().eq('id', currentRoom.id);
   }
+
   currentRoom = null;
   currentSudokuGame = null;
   roomOpened = false;
+  roundUsedItems = [];
   sudokuState = { grid: [], fixed: [], selectedRow: -1, selectedCol: -1, myPlayerNum: 1, mistakes: 0, wrongCells: {}, lockedCells: {}, lastCorrectCell: null, flashCells: {} };
+
+  document.getElementById('chatMessages').innerHTML = '';
+  document.getElementById('roomInfo').innerHTML = '';
+  document.getElementById('sudokuRoomInfo').innerHTML = '';
+  document.getElementById('joinCodeInput').value = '';
+  document.getElementById('sudokuJoinCodeInput').value = '';
+  document.getElementById('roundInfo').style.display = 'none';
+  document.getElementById('roomReadyModal').classList.remove('active');
+  document.getElementById('turnTimer').style.display = 'none';
+  document.getElementById('questionTimerModal').classList.remove('active');
+  document.getElementById('winnerModal').classList.remove('active');
+
+  for (let i = 1; i <= 2; i++) {
+    document.getElementById(`answerArea${i}`).style.display = 'none';
+    document.getElementById(`answerText${i}`).value = '';
+    document.getElementById(`askArea${i}`).style.display = 'none';
+    document.getElementById(`askText${i}`).value = '';
+  }
+}
+
+async function endSudokuGame() {
+  await fullCleanupRoom();
   currentGame = 'sudoku';
   document.getElementById('appLogo').textContent = 'Sudoku';
   renderSudokuCategories();
@@ -3825,13 +4011,14 @@ function enterOnlineGame() {
   updateTurnUI();
 
   if (currentRoom.timer_enabled) {
-    document.getElementById('timerDisplay').style.display = 'inline-block';
-    startTimer(currentRoom.timer_seconds);
+    document.getElementById('turnTimer').style.display = 'inline-block';
+    startTurnTimer();
   } else {
-    document.getElementById('timerDisplay').style.display = 'none';
+    document.getElementById('turnTimer').style.display = 'none';
   }
 
   loadMessages();
+  startRoomStatePoll(1000);
 }
 
 function updateTurnUI() {
@@ -3853,7 +4040,8 @@ function updateTurnUI() {
   if (oppAnswerBtn) oppAnswerBtn.disabled = true;
 
   const oppName = isP1 ? currentRoom.player2_name : currentRoom.player1_name;
-  document.getElementById('turnIndicator').textContent = isMyTurn ? 'Your turn!' : `Turn: ${oppName}`;
+  const turnText = document.querySelector('#turnIndicator .turn-text');
+  turnText.textContent = isMyTurn ? 'Your turn!' : `Turn: ${oppName}`;
 
   document.getElementById(`panel${myNum}`).classList.toggle('active', isMyTurn);
   document.getElementById(`panel${oppNum}`).classList.remove('active');
@@ -3887,37 +4075,83 @@ function updateRoundInfo() {
   document.getElementById('roundText').textContent = `Round ${round} / ${total}`;
 }
 
-let timeRemaining = 0;
-function startTimer(seconds) {
-  stopTimer();
-  timeRemaining = seconds;
-  updateTimerDisplay();
-  timerInterval = setInterval(() => {
-    timeRemaining--;
-    updateTimerDisplay();
-    if (timeRemaining <= 0) {
-      stopTimer();
-      handleTimeUp();
+function startTurnTimer() {
+  if (!currentRoom || !currentRoom.timer_enabled) return;
+  stopTurnTimer();
+  turnTimeRemaining = currentRoom.timer_seconds || 30;
+  turnTimerActive = true;
+  updateTurnTimerDisplay();
+  turnTimerInterval = setInterval(() => {
+    if (!turnTimerActive) return;
+    turnTimeRemaining--;
+    updateTurnTimerDisplay();
+    if (turnTimeRemaining <= 0) {
+      stopTurnTimer();
+      handleTurnTimeout();
     }
   }, 1000);
 }
 
-function updateTimerDisplay() {
-  const el = document.getElementById('timerDisplay');
-  el.textContent = `${timeRemaining}s`;
-  el.classList.toggle('danger', timeRemaining <= 10);
-}
-
-function stopTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
+function restartTurnTimerIfNeeded() {
+  if (!currentRoom || !currentRoom.timer_enabled) return;
+  if (!turnTimerActive || turnTimeRemaining <= 0) {
+    startTurnTimer();
   }
 }
 
-function handleTimeUp() {
-  showToast('Time is up!', 'error');
-  endGame();
+function updateTurnTimerDisplay() {
+  const el = document.getElementById('turnTimer');
+  el.textContent = `${turnTimeRemaining}s`;
+  el.classList.toggle('danger', turnTimeRemaining <= 5);
+}
+
+function stopTurnTimer() {
+  if (turnTimerInterval) {
+    clearInterval(turnTimerInterval);
+    turnTimerInterval = null;
+  }
+  turnTimerActive = false;
+}
+
+async function handleTurnTimeout() {
+  if (!currentRoom) return;
+
+  const isP1 = currentRoom.player1_id === currentUserId;
+  const myNum = isP1 ? 1 : 2;
+  const currentTurnNum = currentRoom.current_turn;
+
+  if (currentTurnNum === myNum) {
+    const myLivesField = isP1 ? 'player1_lives' : 'player2_lives';
+    const myCurrentLives = isP1 ? (currentRoom.player1_lives ?? 3) : (currentRoom.player2_lives ?? 3);
+    const newLives = myCurrentLives - 1;
+
+    const nextTurn = currentTurnNum === 1 ? 2 : 1;
+
+    if (newLives <= 0) {
+      await supa.from('rooms').update({
+        [myLivesField]: 0,
+        status: 'finished'
+      }).eq('id', currentRoom.id);
+      await updateProfileStats(false, 0);
+      showLoserModal(getOpponentImage());
+      return;
+    } else {
+      const { data: updated } = await supa.from('rooms').update({
+        [myLivesField]: newLives,
+        current_turn: nextTurn
+      }).eq('id', currentRoom.id).select().single();
+
+      if (updated) {
+        currentRoom = updated;
+        updateLives();
+        updateTurnUI();
+        startTurnTimer();
+        showToast('Time up! Turn passed & -1 heart', 'error');
+      }
+    }
+  } else {
+    startTurnTimer();
+  }
 }
 
 async function loadMessages() {
@@ -3950,12 +4184,50 @@ async function openAsk(playerNum) {
   if (myNum !== playerNum) return;
   if (currentRoom.current_turn !== playerNum) return;
 
+  stopTurnTimer();
+
   const nextTurn = currentRoom.current_turn === 1 ? 2 : 1;
   const { data: updated, error } = await supa.from('rooms').update({ current_turn: nextTurn }).eq('id', currentRoom.id).select().single();
   if (!error && updated) {
     currentRoom = updated;
     updateTurnUI();
     showToast('Turn passed to opponent', 'success');
+  }
+
+  startQuestionTimer();
+}
+
+function startQuestionTimer() {
+  stopQuestionTimer();
+  questionTimeRemaining = 20;
+  updateQuestionTimerDisplay();
+  document.getElementById('questionTimerModal').classList.add('active');
+  questionTimerInterval = setInterval(() => {
+    questionTimeRemaining--;
+    updateQuestionTimerDisplay();
+    if (questionTimeRemaining <= 0) {
+      stopQuestionTimer();
+      document.getElementById('questionTimerModal').classList.remove('active');
+      startTurnTimer();
+    }
+  }, 1000);
+}
+
+function updateQuestionTimerDisplay() {
+  const secondsEl = document.getElementById('questionTimerSeconds');
+  secondsEl.textContent = questionTimeRemaining;
+  secondsEl.classList.toggle('danger', questionTimeRemaining <= 5);
+
+  const circle = document.getElementById('questionProgressCircle');
+  const circumference = 2 * Math.PI * 70;
+  const offset = circumference - (questionTimeRemaining / 20) * circumference;
+  circle.style.strokeDashoffset = offset;
+}
+
+function stopQuestionTimer() {
+  if (questionTimerInterval) {
+    clearInterval(questionTimerInterval);
+    questionTimerInterval = null;
   }
 }
 
@@ -3969,15 +4241,11 @@ function openAnswer(playerNum) {
   document.getElementById(`answerText${playerNum}`).focus();
 }
 
-async function advanceTurn() {
-  if (!currentRoom) return;
-  const nextTurn = currentRoom.current_turn === 1 ? 2 : 1;
-  await supa.from('rooms').update({ current_turn: nextTurn }).eq('id', currentRoom.id);
-}
-
 async function submitAnswer(playerNum) {
   const text = document.getElementById(`answerText${playerNum}`).value.trim().toLowerCase();
   if (!text) return;
+
+  stopTurnTimer();
 
   const oppImage = getOpponentImage();
   const isCorrect = checkAnswer(text, oppImage);
@@ -3991,27 +4259,35 @@ async function submitAnswer(playerNum) {
   if (isCorrect) {
     await supa.from('rooms').update({ status: 'finished' }).eq('id', currentRoom.id);
     await updateProfileStats(true, 1);
-    stopTimer();
     showWinnerModal(true, oppImage);
     return;
   } else {
     const newLives = myCurrentLives - 1;
-    const { data: updated } = await supa.from('rooms').update({ [myLivesField]: newLives }).eq('id', currentRoom.id).select().single();
-    if (updated) currentRoom = updated;
-    updateLives();
+    const nextTurn = currentRoom.current_turn === 1 ? 2 : 1;
 
     if (newLives <= 0) {
-      await supa.from('rooms').update({ status: 'finished' }).eq('id', currentRoom.id);
+      await supa.from('rooms').update({
+        [myLivesField]: 0,
+        status: 'finished'
+      }).eq('id', currentRoom.id);
       await updateProfileStats(false, 0);
-      stopTimer();
       showLoserModal(oppImage);
       return;
     } else {
-      showToast(`Wrong! ${newLives} lives left`, 'error');
+      const { data: updated } = await supa.from('rooms').update({
+        [myLivesField]: newLives,
+        current_turn: nextTurn
+      }).eq('id', currentRoom.id).select().single();
+
+      if (updated) {
+        currentRoom = updated;
+        updateLives();
+        updateTurnUI();
+        showToast(`Wrong! ${newLives} lives left`, 'error');
+        if (currentRoom.timer_enabled) startTurnTimer();
+      }
     }
   }
-
-  await advanceTurn();
 }
 
 function checkAnswer(text, image) {
@@ -4039,27 +4315,23 @@ function showLoserModal(opponentImage) {
 
 function closeWinnerAndReset() {
   document.getElementById('winnerModal').classList.remove('active');
-  endGame();
+  fullCleanupRoom();
+  if (currentGame === 'revealme') {
+    document.getElementById('appLogo').textContent = 'RevealMe';
+    renderRevealMeCategories();
+    showPage('pageRevealMe');
+  } else if (currentGame === 'sudoku') {
+    document.getElementById('appLogo').textContent = 'Sudoku';
+    renderSudokuCategories();
+    showPage('pageSudoku');
+  } else {
+    document.getElementById('appLogo').textContent = 'PlayHub';
+    showPage('pageGameSelect');
+  }
 }
 
 function endGame() {
-  stopTimer();
-  stopRoomPolling();
-  if (realtimeChannel) { supa.removeChannel(realtimeChannel); realtimeChannel = null; }
-  currentRoom = null;
-  roomOpened = false;
-  roundUsedItems = [];
-  document.getElementById('chatMessages').innerHTML = '';
-  document.getElementById('roomInfo').innerHTML = '';
-  document.getElementById('sudokuRoomInfo').innerHTML = '';
-  document.getElementById('joinCodeInput').value = '';
-  document.getElementById('sudokuJoinCodeInput').value = '';
-  document.getElementById('roundInfo').style.display = 'none';
-  document.getElementById('roomReadyModal').classList.remove('active');
-  for (let i = 1; i <= 2; i++) {
-    document.getElementById(`answerArea${i}`).style.display = 'none';
-    document.getElementById(`answerText${i}`).value = '';
-  }
+  fullCleanupRoom();
   if (currentGame === 'revealme') {
     document.getElementById('appLogo').textContent = 'RevealMe';
     renderRevealMeCategories();
