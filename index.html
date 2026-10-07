@@ -755,7 +755,28 @@
   }
   .edit-avatar-btn:hover { transform: scale(1.15) rotate(-15deg); box-shadow: 0 6px 20px var(--shadow); }
   .profile-info { flex: 1; min-width: 0; }
-  .profile-username { font-size: 1.4rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .profile-username {
+    font-size: 1.4rem;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 1.8rem;
+  }
+  .typewriter-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.4rem;
+    background: var(--primary);
+    vertical-align: middle;
+    margin-left: 2px;
+    animation: blinkCursor 0.7s steps(1) infinite;
+    box-shadow: 0 0 8px var(--primary);
+  }
+  @keyframes blinkCursor {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
 
   .profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
   .stat-box { background: rgba(108,92,231,0.12); padding: 14px 8px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
@@ -1594,7 +1615,7 @@
         <button class="edit-avatar-btn" onclick="openAvatarPicker()" title="Change avatar">✏️</button>
       </div>
       <div class="profile-info">
-        <div class="profile-username" id="profileUsername">—</div>
+        <div class="profile-username" id="profileUsername"></div>
       </div>
     </div>
     <div class="profile-stats">
@@ -1625,7 +1646,7 @@
         <div class="profile-avatar-big" id="friendProfileAvatar">🦁</div>
       </div>
       <div class="profile-info">
-        <div class="profile-username" id="friendProfileUsername">—</div>
+        <div class="profile-username" id="friendProfileUsername"></div>
       </div>
     </div>
     <div class="profile-stats">
@@ -2053,6 +2074,7 @@ let roomPollInterval = null;
 let sudokuPollInterval = null;
 let roomStatePoll = null;
 let leaveTarget = null;
+let typewriterInterval = null;
 
 let sudokuState = {
   grid: [],
@@ -2190,6 +2212,27 @@ function showToast(message, type = 'success') {
   setTimeout(() => {
     if (toast.parentNode) toast.parentNode.removeChild(toast);
   }, 3000);
+}
+
+function typewriterEffect(element, text, speed = 60) {
+  if (typewriterInterval) {
+    clearInterval(typewriterInterval);
+    typewriterInterval = null;
+  }
+  element.innerHTML = '';
+  const cursor = document.createElement('span');
+  cursor.className = 'typewriter-cursor';
+  element.appendChild(cursor);
+  let i = 0;
+  typewriterInterval = setInterval(() => {
+    if (i < text.length) {
+      cursor.insertAdjacentText('beforebegin', text[i]);
+      i++;
+    } else {
+      clearInterval(typewriterInterval);
+      typewriterInterval = null;
+    }
+  }, speed);
 }
 
 (function initSpace() {
@@ -2584,6 +2627,7 @@ async function logout() {
   stopRoomStatePoll();
   stopTurnTimer();
   stopQuestionTimer();
+  if (typewriterInterval) { clearInterval(typewriterInterval); typewriterInterval = null; }
   currentUser = null; currentUserId = null; currentProfile = null; currentRoom = null; currentGame = null; currentSudokuGame = null;
   roomOpened = false;
   document.getElementById('authScreen').style.display = 'flex';
@@ -2679,12 +2723,14 @@ function openProfile() {
 
 function closeProfile() {
   document.getElementById('profileBackdrop').classList.remove('active');
+  if (typewriterInterval) { clearInterval(typewriterInterval); typewriterInterval = null; }
 }
 
 function renderProfile() {
   if (!currentProfile) return;
   document.getElementById('profileAvatarBig').textContent = currentProfile.avatar || '🦁';
-  document.getElementById('profileUsername').textContent = '@' + (currentProfile.username || currentUser);
+  const usernameText = '@' + (currentProfile.username || currentUser);
+  typewriterEffect(document.getElementById('profileUsername'), usernameText, 70);
   document.getElementById('statScore').textContent = currentProfile.total_score || 0;
   document.getElementById('statPlayed').textContent = currentProfile.games_played || 0;
   document.getElementById('statWon').textContent = currentProfile.games_won || 0;
@@ -2706,7 +2752,8 @@ async function openFriendProfile(friendId) {
   if (!profile) { showToast('Profile not found', 'error'); return; }
 
   document.getElementById('friendProfileAvatar').textContent = profile.avatar || '🦁';
-  document.getElementById('friendProfileUsername').textContent = '@' + profile.username;
+  const usernameText = '@' + profile.username;
+  typewriterEffect(document.getElementById('friendProfileUsername'), usernameText, 70);
   document.getElementById('friendStatScore').textContent = profile.total_score || 0;
   document.getElementById('friendStatPlayed').textContent = profile.games_played || 0;
   document.getElementById('friendStatWon').textContent = profile.games_won || 0;
@@ -2726,6 +2773,7 @@ async function openFriendProfile(friendId) {
 
 function closeFriendProfile() {
   document.getElementById('friendProfileBackdrop').classList.remove('active');
+  if (typewriterInterval) { clearInterval(typewriterInterval); typewriterInterval = null; }
 }
 
 function openPlayerProfileFromGame(num) {
@@ -2946,7 +2994,10 @@ async function createSudokuRoom(difficulty) {
     rounds: 1,
     timer_enabled: false,
     timer_seconds: 0,
-    current_round: 1
+    current_round: 1,
+    question_timer_active: false,
+    question_timer_started_at: null,
+    question_timer_duration: 20
   }).select().single();
 
   if (error) {
@@ -2991,7 +3042,10 @@ async function confirmCreateRoom() {
     timer_enabled: settingsState.timerEnabled,
     timer_seconds: settingsState.timerSeconds,
     current_round: 1,
-    current_turn: 1
+    current_turn: 1,
+    question_timer_active: false,
+    question_timer_started_at: null,
+    question_timer_duration: 20
   }).select().single();
 
   if (error) {
@@ -3044,12 +3098,24 @@ function startRoomStatePoll(intervalMs) {
     if (!currentRoom) { stopRoomStatePoll(); return; }
     const { data } = await supa.from('rooms').select('*').eq('id', currentRoom.id).maybeSingle();
     if (data) {
+      const oldRoom = currentRoom;
       currentRoom = data;
+
       if (!data.category?.startsWith('sudoku_')) {
         updateLives();
-        updateTurnUI();
-        if (data.timer_enabled && data.status === 'playing') {
-          restartTurnTimerIfNeeded();
+
+        if (data.question_timer_active && !oldRoom?.question_timer_active) {
+          startSyncedQuestionTimer();
+        } else if (!data.question_timer_active && oldRoom?.question_timer_active) {
+          stopQuestionTimer();
+          document.getElementById('questionTimerModal').classList.remove('active');
+        }
+
+        if (!data.question_timer_active) {
+          updateTurnUI();
+          if (data.timer_enabled && data.status === 'playing') {
+            restartTurnTimerIfNeeded();
+          }
         }
       }
     }
@@ -3188,6 +3254,7 @@ function listenToRoom(roomId) {
       event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}`
     }, async (payload) => {
       const room = payload.new;
+      const oldRoom = currentRoom;
       currentRoom = room;
 
       if (room.status === 'finished') {
@@ -3205,9 +3272,19 @@ function listenToRoom(roomId) {
 
       if (room.status === 'playing' && !room.category?.startsWith('sudoku_')) {
         updateLives();
-        updateTurnUI();
-        if (room.timer_enabled) {
-          restartTurnTimerIfNeeded();
+
+        if (room.question_timer_active && !oldRoom?.question_timer_active) {
+          startSyncedQuestionTimer();
+        } else if (!room.question_timer_active && oldRoom?.question_timer_active) {
+          stopQuestionTimer();
+          document.getElementById('questionTimerModal').classList.remove('active');
+        }
+
+        if (!room.question_timer_active) {
+          updateTurnUI();
+          if (room.timer_enabled) {
+            restartTurnTimerIfNeeded();
+          }
         }
       }
     })
@@ -3596,13 +3673,20 @@ function confirmLeaveRevealMe() {
 
 async function confirmLeaveYes() {
   document.getElementById('confirmLeaveModal').classList.remove('active');
+  const target = leaveTarget;
+  leaveTarget = null;
+
   await fullCleanupRoom();
-  if (leaveTarget === 'sudoku') {
+
+  document.getElementById('gameBoard').style.display = 'none';
+  document.getElementById('pageSudokuGame').classList.remove('active');
+
+  if (target === 'sudoku') {
     currentGame = 'sudoku';
     document.getElementById('appLogo').textContent = 'Sudoku';
     renderSudokuCategories();
     showPage('pageSudoku');
-  } else if (leaveTarget === 'revealme') {
+  } else if (target === 'revealme') {
     currentGame = 'revealme';
     document.getElementById('appLogo').textContent = 'RevealMe';
     renderRevealMeCategories();
@@ -3612,7 +3696,6 @@ async function confirmLeaveYes() {
     document.getElementById('appLogo').textContent = 'PlayHub';
     showPage('pageGameSelect');
   }
-  leaveTarget = null;
 }
 
 function confirmLeaveNo() {
@@ -3650,6 +3733,7 @@ async function fullCleanupRoom() {
   document.getElementById('turnTimer').style.display = 'none';
   document.getElementById('questionTimerModal').classList.remove('active');
   document.getElementById('winnerModal').classList.remove('active');
+  document.getElementById('gameBoard').style.display = 'none';
 
   for (let i = 1; i <= 2; i++) {
     document.getElementById(`answerArea${i}`).style.display = 'none';
@@ -4005,6 +4089,7 @@ function enterOnlineGame() {
 
   document.getElementById('answerArea1').style.display = 'none';
   document.getElementById('answerArea2').style.display = 'none';
+  document.getElementById('questionTimerModal').classList.remove('active');
 
   updateLives();
   updateRoundInfo();
@@ -4028,22 +4113,28 @@ function updateTurnUI() {
   const oppNum = isP1 ? 2 : 1;
 
   const isMyTurn = currentRoom.current_turn === myNum;
+  const questionActive = currentRoom.question_timer_active === true;
 
   const myAskBtn = document.getElementById(`askBtn${myNum}`);
   const myAnswerBtn = document.getElementById(`answerBtn${myNum}`);
   const oppAskBtn = document.getElementById(`askBtn${oppNum}`);
   const oppAnswerBtn = document.getElementById(`answerBtn${oppNum}`);
 
-  if (myAskBtn) myAskBtn.disabled = !isMyTurn;
-  if (myAnswerBtn) myAnswerBtn.disabled = !isMyTurn;
+  if (myAskBtn) myAskBtn.disabled = !isMyTurn || questionActive;
+  if (myAnswerBtn) myAnswerBtn.disabled = !isMyTurn || questionActive;
   if (oppAskBtn) oppAskBtn.disabled = true;
   if (oppAnswerBtn) oppAnswerBtn.disabled = true;
 
   const oppName = isP1 ? currentRoom.player2_name : currentRoom.player1_name;
   const turnText = document.querySelector('#turnIndicator .turn-text');
-  turnText.textContent = isMyTurn ? 'Your turn!' : `Turn: ${oppName}`;
 
-  document.getElementById(`panel${myNum}`).classList.toggle('active', isMyTurn);
+  if (questionActive) {
+    turnText.textContent = '⏸️ Question time...';
+  } else {
+    turnText.textContent = isMyTurn ? 'Your turn!' : `Turn: ${oppName}`;
+  }
+
+  document.getElementById(`panel${myNum}`).classList.toggle('active', isMyTurn && !questionActive);
   document.getElementById(`panel${oppNum}`).classList.remove('active');
 }
 
@@ -4116,6 +4207,8 @@ function stopTurnTimer() {
 async function handleTurnTimeout() {
   if (!currentRoom) return;
 
+  if (currentRoom.question_timer_active) return;
+
   const isP1 = currentRoom.player1_id === currentUserId;
   const myNum = isP1 ? 1 : 2;
   const currentTurnNum = currentRoom.current_turn;
@@ -4183,34 +4276,85 @@ async function openAsk(playerNum) {
   const myNum = getMyPlayerNum();
   if (myNum !== playerNum) return;
   if (currentRoom.current_turn !== playerNum) return;
+  if (currentRoom.question_timer_active) return;
 
   stopTurnTimer();
 
+  const questionDuration = 20;
+  const startedAt = new Date().toISOString();
+
+  const { data: updated, error } = await supa.from('rooms').update({
+    question_timer_active: true,
+    question_timer_started_at: startedAt,
+    question_timer_duration: questionDuration
+  }).eq('id', currentRoom.id).select().single();
+
+  if (!error && updated) {
+    currentRoom = updated;
+    startSyncedQuestionTimer();
+  }
+}
+
+function startSyncedQuestionTimer() {
+  if (!currentRoom || !currentRoom.question_timer_active || !currentRoom.question_timer_started_at) return;
+
+  stopQuestionTimer();
+
+  const startedAt = new Date(currentRoom.question_timer_started_at).getTime();
+  const duration = currentRoom.question_timer_duration || 20;
+
+  const now = Date.now();
+  const elapsed = Math.floor((now - startedAt) / 1000);
+  questionTimeRemaining = Math.max(0, duration - elapsed);
+
+  updateQuestionTimerDisplay();
+  document.getElementById('questionTimerModal').classList.add('active');
+
+  if (questionTimeRemaining <= 0) {
+    stopQuestionTimer();
+    finishQuestionTimer();
+    return;
+  }
+
+  questionTimerInterval = setInterval(() => {
+    if (!currentRoom || !currentRoom.question_timer_active) {
+      stopQuestionTimer();
+      return;
+    }
+    const startTs = new Date(currentRoom.question_timer_started_at).getTime();
+    const nowTs = Date.now();
+    const elapsedTs = Math.floor((nowTs - startTs) / 1000);
+    questionTimeRemaining = Math.max(0, duration - elapsedTs);
+
+    updateQuestionTimerDisplay();
+
+    if (questionTimeRemaining <= 0) {
+      stopQuestionTimer();
+      finishQuestionTimer();
+    }
+  }, 200);
+}
+
+async function finishQuestionTimer() {
+  document.getElementById('questionTimerModal').classList.remove('active');
+
+  if (!currentRoom) return;
+
   const nextTurn = currentRoom.current_turn === 1 ? 2 : 1;
-  const { data: updated, error } = await supa.from('rooms').update({ current_turn: nextTurn }).eq('id', currentRoom.id).select().single();
+
+  const { data: updated, error } = await supa.from('rooms').update({
+    question_timer_active: false,
+    question_timer_started_at: null,
+    current_turn: nextTurn
+  }).eq('id', currentRoom.id).select().single();
+
   if (!error && updated) {
     currentRoom = updated;
     updateTurnUI();
-    showToast('Turn passed to opponent', 'success');
-  }
-
-  startQuestionTimer();
-}
-
-function startQuestionTimer() {
-  stopQuestionTimer();
-  questionTimeRemaining = 20;
-  updateQuestionTimerDisplay();
-  document.getElementById('questionTimerModal').classList.add('active');
-  questionTimerInterval = setInterval(() => {
-    questionTimeRemaining--;
-    updateQuestionTimerDisplay();
-    if (questionTimeRemaining <= 0) {
-      stopQuestionTimer();
-      document.getElementById('questionTimerModal').classList.remove('active');
+    if (currentRoom.timer_enabled) {
       startTurnTimer();
     }
-  }, 1000);
+  }
 }
 
 function updateQuestionTimerDisplay() {
